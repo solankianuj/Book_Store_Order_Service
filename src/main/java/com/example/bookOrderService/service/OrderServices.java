@@ -15,6 +15,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Purpose-implementation of order service operation APIs logic.
+ * @author anuj solanki
+ * @date 21/09/2022
+ * @version 1.0
+ */
 @Service
 public class OrderServices implements IOrderServices{
 
@@ -26,6 +32,14 @@ public class OrderServices implements IOrderServices{
     MailServices mailServices;
     @Autowired
     Token tokenUtil;
+
+    /**
+     * purpose-Logic implementation of API to place order.
+     * @param token
+     * @param cartId
+     * @param addressModel
+     * @return
+     */
     @Override
     public Response placeOrder(String token, long cartId, AddressModel addressModel) {
         if (isUserPresent(token)!=null){
@@ -45,6 +59,12 @@ public class OrderServices implements IOrderServices{
         throw  new OrderNotFound(400,"User Not Found !");
     }
 
+    /**
+     * purpose-Logic implementation of API to cancel order.
+     * @param token
+     * @param orderId
+     * @return
+     */
     @Override
     public Response cancelOrder(String token, long orderId) {
         if (isUserPresent(token)!=null){
@@ -60,6 +80,11 @@ public class OrderServices implements IOrderServices{
 
     }
 
+    /**
+     * purpose-Logic implementation of API to fetch user's order.
+     * @param token
+     * @return
+     */
     @Override
     public Response getOrderOfUser(String token) {
         if (isUserPresent(token)!=null){
@@ -70,17 +95,33 @@ public class OrderServices implements IOrderServices{
         throw  new OrderNotFound(400,"User Not Found !");
     }
 
+    /**
+     * purpose-Logic implementation of API to fetch all orders
+     * @return
+     */
     @Override
     public Response getAllOrder() {
         List<OrderModel> listOfOrder =orderRepository.findAll().stream().filter(x-> x.isCancel()==false).collect(Collectors.toList());
         return new Response("Fetching all confirm orders",200,listOfOrder);
     }
 
+    /**
+     * purpose-Method to fetch user.
+     * @param token
+     * @return
+     */
     public BookStoreUser isUserPresent(String token){
-        return restTemplate.getForObject("http://localhost:9091/user/verify/"+token,BookStoreUser.class);
+        return restTemplate.getForObject("http://BOOK-STORE-USER-SERVICE/user/verify/"+token,BookStoreUser.class);
     }
+
+    /**
+     * purpose-Method to fetch cart.
+     * @param token
+     * @param cartId
+     * @return
+     */
     public CartModel isCartPresent(String token,long cartId){
-        return restTemplate.getForObject("http://localhost:9093/cart/getCart/{token}/{cartId}",CartModel.class,token,cartId);
+        return restTemplate.getForObject("http://BOOK-CART-SERVICE/cart/getCart/{token}/{cartId}",CartModel.class,token,cartId);
     }
 
 }
